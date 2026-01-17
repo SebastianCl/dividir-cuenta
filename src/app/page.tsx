@@ -40,7 +40,7 @@ export default function HomePage() {
         .insert({
           short_code: code,
           name: sessionName.trim() || 'Mi Cena',
-        })
+        } as any)
         .select()
         .single()
 
@@ -50,18 +50,18 @@ export default function HomePage() {
       const { data: participant, error: participantError } = await supabase
         .from('participants')
         .insert({
-          session_id: session.id,
+          session_id: (session as any).id,
           name: creatorName.trim(),
           color: getRandomColor(),
           is_owner: true,
-        })
+        } as any)
         .select()
         .single()
 
       if (participantError) throw participantError
 
       // Guardar ID del participante en localStorage
-      localStorage.setItem(`participant_${code}`, participant.id)
+      localStorage.setItem(`participant_${code}`, (participant as any).id)
 
       toast.success('¡Cena creada!')
       router.push(`/s/${code}`)
@@ -96,7 +96,7 @@ export default function HomePage() {
         return
       }
 
-      if (session.status !== 'active') {
+      if ((session as any).status !== 'active') {
         toast.error('Esta cena ya no está activa.')
         return
       }

@@ -18,6 +18,7 @@ export function useRealtime(sessionId: string | null) {
     removeItem,
     setAssignments,
     addAssignment,
+    updateAssignment,
     removeAssignment,
   } = useSessionStore()
 
@@ -157,6 +158,12 @@ export function useRealtime(sessionId: string | null) {
             case 'INSERT':
               addAssignment(payload.new as Assignment)
               break
+            case 'UPDATE':
+              updateAssignment(
+                (payload.new as Assignment).id,
+                payload.new as Assignment
+              )
+              break
             case 'DELETE':
               removeAssignment((payload.old as Assignment).id)
               break
@@ -179,6 +186,7 @@ export function useRealtime(sessionId: string | null) {
     updateItem,
     removeItem,
     addAssignment,
+    updateAssignment,
     removeAssignment,
   ])
 

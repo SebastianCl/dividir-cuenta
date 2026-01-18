@@ -25,6 +25,7 @@ interface SessionState {
   removeItem: (id: string) => void
   setAssignments: (assignments: Assignment[]) => void
   addAssignment: (assignment: Assignment) => void
+  updateAssignment: (id: string, updates: Partial<Assignment>) => void
   removeAssignment: (id: string) => void
   setCurrentParticipant: (participant: Participant | null) => void
   
@@ -90,6 +91,13 @@ export const useSessionStore = create<SessionState>()(
       addAssignment: (assignment) =>
         set((state) => ({
           assignments: [...state.assignments, assignment],
+        })),
+      
+      updateAssignment: (id, updates) =>
+        set((state) => ({
+          assignments: state.assignments.map((a) =>
+            a.id === id ? { ...a, ...updates } : a
+          ),
         })),
       
       removeAssignment: (id) =>

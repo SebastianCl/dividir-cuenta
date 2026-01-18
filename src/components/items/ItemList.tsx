@@ -15,7 +15,7 @@ interface ItemListProps {
 }
 
 export function ItemList({ sessionId, isOwner = false }: ItemListProps) {
-  const { items, assignments, participants, updateItem, removeItem, addItem, addAssignment, removeAssignment } = useSessionStore()
+  const { items, assignments, participants, updateItem, removeItem, addItem, addAssignment, updateAssignment, removeAssignment } = useSessionStore()
   const supabase = createClient()
 
   const handleEdit = async (id: string, updates: Partial<Item>) => {
@@ -54,11 +54,41 @@ export function ItemList({ sessionId, isOwner = false }: ItemListProps) {
     if (existingAssignment) {
       removeAssignment(existingAssignment.id)
       await supabase.from('assignments').delete().eq('id', existingAssignment.id)
+      
+      // Actualizar share_fraction de las asignaciones restantes
+      const remainingAssignments = assignments.filter(
+        (a) => a.item_id === itemId && a.id !== existingAssignment.id
+      )
+      if (remainingAssignments.length > 0) {
+        const newShareFraction = 1.0 / remainingAssignments.length
+        for (const assignment of remainingAssignments) {
+          updateAssignment(assignment.id, { share_fraction: newShareFraction })
+          await supabase
+            .from('assignments')
+            .update({ share_fraction: newShareFraction } as any)
+            .eq('id', assignment.id)
+        }
+      }
     } else {
+      // Calcular el número de asignaciones después de agregar la nueva
+      const currentAssignments = assignments.filter((a) => a.item_id === itemId)
+      const totalAssignments = currentAssignments.length + 1
+      const shareFraction = 1.0 / totalAssignments
+      
+      // Actualizar share_fraction de las asignaciones existentes
+      for (const assignment of currentAssignments) {
+        updateAssignment(assignment.id, { share_fraction: shareFraction })
+        await supabase
+          .from('assignments')
+          .update({ share_fraction: shareFraction } as any)
+          .eq('id', assignment.id)
+      }
+      
+      // Crear la nueva asignación
       const newAssignment: import('@/types/database').Database['public']['Tables']['assignments']['Insert'] = {
         item_id: itemId,
         participant_id: participantId,
-        share_fraction: 1.0,
+        share_fraction: shareFraction,
       }
       const { data } = await supabase
         .from('assignments')
@@ -69,6 +99,7 @@ export function ItemList({ sessionId, isOwner = false }: ItemListProps) {
         addAssignment(data as Assignment)
       }
     }
+    
     const itemAssignments = assignments.filter((a) => a.item_id === itemId)
     const willBeShared = existingAssignment 
       ? itemAssignments.length > 2 

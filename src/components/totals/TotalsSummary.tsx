@@ -2,59 +2,87 @@
 
 import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { ParticipantAvatar } from '@/components/participants/ParticipantAvatar'
+import { TaxTipInput } from './TaxTipInput'
 
 import { useSessionStore } from '@/store/session-store'
-import { formatCOP, calculateTotalWithExtras } from '@/lib/currency'
+import { formatCOP, calculateTotalWithTaxAndTip, type TaxTipType } from '@/lib/currency'
 import { createClient } from '@/lib/supabase/client'
 import { Copy, Check, Receipt } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Session } from '@/types/database'
 
 export function TotalsSummary() {
   const { session, participants, items, assignments, getParticipantTotal } = useSessionStore()
-  const [tipPercentage, setTipPercentage] = useState(session?.tip_percentage || 0)
-  const [taxAmount, setTaxAmount] = useState(session?.tax_amount || 0)
+  const [tipType, setTipType] = useState<TaxTipType>(session?.tip_type || 'percentage')
+  const [tipValue, setTipValue] = useState(session?.tip_value || 0)
+  const [taxType, setTaxType] = useState<TaxTipType>(session?.tax_type || 'percentage')
+  const [taxValue, setTaxValue] = useState(session?.tax_value || 0)
   const [copied, setCopied] = useState(false)
   const supabase = createClient()
 
   const subtotal = items.reduce((sum, item) => sum + item.total_price, 0)
-  const { tip, total } = calculateTotalWithExtras(subtotal, tipPercentage, taxAmount)
+  const { tip, tax, total } = calculateTotalWithTaxAndTip(
+    subtotal,
+    tipType,
+    tipValue,
+    taxType,
+    taxValue
+  )
 
-  // Calcular total por persona incluyendo propina e impuestos proporcionales
   const getParticipantFinalTotal = (participantId: string) => {
     const participantSubtotal = getParticipantTotal(participantId)
     if (subtotal === 0) return 0
     
     const proportion = participantSubtotal / subtotal
     const participantTip = tip * proportion
-    const participantTax = taxAmount * proportion
+    const participantTax = tax * proportion
     
     return participantSubtotal + participantTip + participantTax
   }
 
-  const handleTipChange = async (value: number) => {
-    setTipPercentage(value)
+  const handleTipTypeChange = async (newType: TaxTipType) => {
+    setTipType(newType)
     if (session) {
       await supabase
         .from('sessions')
         // @ts-expect-error - Supabase types inference issue
-        .update({ tip_percentage: value })
+        .update({ tip_type: newType })
         .eq('id', session.id)
     }
   }
 
-  const handleTaxChange = async (value: number) => {
-    setTaxAmount(value)
+  const handleTipValueChange = async (value: number) => {
+    setTipValue(value)
     if (session) {
       await supabase
         .from('sessions')
         // @ts-expect-error - Supabase types inference issue
-        .update({ tax_amount: value })
+        .update({ tip_value: value })
+        .eq('id', session.id)
+    }
+  }
+
+  const handleTaxTypeChange = async (newType: TaxTipType) => {
+    setTaxType(newType)
+    if (session) {
+      await supabase
+        .from('sessions')
+        // @ts-expect-error - Supabase types inference issue
+        .update({ tax_type: newType })
+        .eq('id', session.id)
+    }
+  }
+
+  const handleTaxValueChange = async (value: number) => {
+    setTaxValue(value)
+    if (session) {
+      await supabase
+        .from('sessions')
+        // @ts-expect-error - Supabase types inference issue
+        .update({ tax_value: value })
         .eq('id', session.id)
     }
   }
@@ -70,11 +98,13 @@ export function TotalsSummary() {
     
     summary += `\n━━━━━━━━━━━━━━━━━━\n`
     summary += `📊 Subtotal: ${formatCOP(subtotal)}\n`
-    if (tipPercentage > 0) {
-      summary += `💰 Propina (${tipPercentage}%): ${formatCOP(tip)}\n`
+    if (tipValue > 0) {
+      const tipLabel = tipType === 'percentage' ? `${tipValue}%` : ''
+      summary += `💰 Propina${tipLabel ? ` (${tipLabel})` : ''}: ${formatCOP(tip)}\n`
     }
-    if (taxAmount > 0) {
-      summary += `🧾 Impuestos: ${formatCOP(taxAmount)}\n`
+    if (taxValue > 0) {
+      const taxLabel = taxType === 'percentage' ? `${taxValue}%` : ''
+      summary += `🧾 Impuestos${taxLabel ? ` (${taxLabel})` : ''}: ${formatCOP(tax)}\n`
     }
     summary += `💵 *Total: ${formatCOP(total)}*`
     
@@ -135,33 +165,22 @@ export function TotalsSummary() {
 
         {/* Configuración de propina e impuestos */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <Label htmlFor="tip" className="text-xs">
-              Propina (%)
-            </Label>
-            <Input
-              id="tip"
-              type="number"
-              value={tipPercentage}
-              onChange={(e) => handleTipChange(parseFloat(e.target.value) || 0)}
-              min={0}
-              max={100}
-              className="h-8"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="tax" className="text-xs">
-              Impuestos ($)
-            </Label>
-            <Input
-              id="tax"
-              type="number"
-              value={taxAmount}
-              onChange={(e) => handleTaxChange(parseFloat(e.target.value) || 0)}
-              min={0}
-              className="h-8"
-            />
-          </div>
+          <TaxTipInput
+            label="Propina"
+            type={tipType}
+            value={tipValue}
+            onTypeChange={handleTipTypeChange}
+            onValueChange={handleTipValueChange}
+            max={999999}
+          />
+          <TaxTipInput
+            label="Impuestos (IVA)"
+            type={taxType}
+            value={taxValue}
+            onTypeChange={handleTaxTypeChange}
+            onValueChange={handleTaxValueChange}
+            max={999999}
+          />
         </div>
 
         <Separator />
@@ -172,16 +191,20 @@ export function TotalsSummary() {
             <span className="text-muted-foreground">Subtotal</span>
             <span>{formatCOP(subtotal)}</span>
           </div>
-          {tipPercentage > 0 && (
+          {tipValue > 0 && (
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Propina ({tipPercentage}%)</span>
+              <span className="text-muted-foreground">
+                Propina {tipType === 'percentage' ? `(${tipValue}%)` : ''}
+              </span>
               <span>{formatCOP(tip)}</span>
             </div>
           )}
-          {taxAmount > 0 && (
+          {taxValue > 0 && (
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Impuestos</span>
-              <span>{formatCOP(taxAmount)}</span>
+              <span className="text-muted-foreground">
+                Impuestos {taxType === 'percentage' ? `(${taxValue}%)` : ''}
+              </span>
+              <span>{formatCOP(tax)}</span>
             </div>
           )}
           <div className="flex justify-between text-lg font-bold pt-2">

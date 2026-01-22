@@ -14,8 +14,10 @@ export type Database = {
           expires_at: string | null
           status: 'active' | 'closed' | 'archived'
           receipt_image_url: string | null
-          tip_percentage: number
-          tax_amount: number
+          tip_type: 'fixed' | 'percentage'
+          tip_value: number
+          tax_type: 'fixed' | 'percentage'
+          tax_value: number
         }
         Insert: {
           id?: string
@@ -25,8 +27,10 @@ export type Database = {
           expires_at?: string | null
           status?: 'active' | 'closed' | 'archived'
           receipt_image_url?: string | null
-          tip_percentage?: number
-          tax_amount?: number
+          tip_type?: 'fixed' | 'percentage'
+          tip_value?: number
+          tax_type?: 'fixed' | 'percentage'
+          tax_value?: number
         }
         Update: {
           id?: string
@@ -36,8 +40,10 @@ export type Database = {
           expires_at?: string | null
           status?: 'active' | 'closed' | 'archived'
           receipt_image_url?: string | null
-          tip_percentage?: number
-          tax_amount?: number
+          tip_type?: 'fixed' | 'percentage'
+          tip_value?: number
+          tax_type?: 'fixed' | 'percentage'
+          tax_value?: number
         }
       }
       participants: {

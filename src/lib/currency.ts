@@ -52,7 +52,42 @@ export function formatNumberForInput(amount: number): string {
 }
 
 /**
- * Calcula el total con propina e IVA
+ * Tipos para propina e impuestos
+ */
+export type TaxTipType = 'fixed' | 'percentage'
+
+/**
+ * Calcula el valor final de propina o impuesto
+ */
+export function calculateTaxTipValue(
+  value: number,
+  type: TaxTipType,
+  subtotal: number
+): number {
+  if (type === 'percentage') {
+    return subtotal * (Math.max(0, Math.min(value, 100)) / 100)
+  }
+  return Math.max(0, value) // Fixed amount, no negatives
+}
+
+/**
+ * Calcula el total con propina e impuestos (nuevo)
+ */
+export function calculateTotalWithTaxAndTip(
+  subtotal: number,
+  tipType: TaxTipType = 'percentage',
+  tipValue: number = 0,
+  taxType: TaxTipType = 'percentage',
+  taxValue: number = 0
+): { tip: number; tax: number; total: number } {
+  const tip = calculateTaxTipValue(tipValue, tipType, subtotal)
+  const tax = calculateTaxTipValue(taxValue, taxType, subtotal)
+  const total = subtotal + tip + tax
+  return { tip, tax, total }
+}
+
+/**
+ * Calcula el total con propina e IVA (compatible hacia atrás)
  */
 export function calculateTotalWithExtras(
   subtotal: number,

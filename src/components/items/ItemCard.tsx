@@ -5,13 +5,13 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { 
-  Pencil, 
-  Trash2, 
-  Check, 
-  X, 
+import {
+  Pencil,
+  Trash2,
+  Check,
+  X,
   Users,
-  AlertCircle 
+  AlertCircle
 } from 'lucide-react'
 import { formatCOP, parseCOP } from '@/lib/currency'
 import { ParticipantAvatar } from '@/components/participants/ParticipantAvatar'
@@ -110,15 +110,15 @@ export function ItemCard({
           <>
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium truncate">{item.name}</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-medium break-words leading-tight">{item.name}</span>
                   {item.quantity > 1 && (
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="secondary" className="text-xs shrink-0">
                       x{item.quantity}
                     </Badge>
                   )}
                   {isShared && (
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs shrink-0">
                       <Users className="h-3 w-3 mr-1" />
                       Compartido
                     </Badge>
@@ -131,7 +131,7 @@ export function ItemCard({
                   </div>
                 )}
               </div>
-              <span className="font-semibold text-primary whitespace-nowrap">
+              <span className="font-semibold text-primary whitespace-nowrap shrink-0 ml-2">
                 {formatCOP(item.total_price)}
               </span>
             </div>
@@ -155,7 +155,7 @@ export function ItemCard({
                   ))
                 )}
               </div>
-              
+
               <div className="flex gap-1">
                 <Button
                   size="sm"

@@ -77,8 +77,14 @@ export function FinalizeSessionDialog({
 
       toast.success('Cuenta finalizada correctamente')
       
-      // Redirigir a la página principal
-      router.push('/')
+      // Construir URL con parámetros
+      const params = new URLSearchParams()
+      if (sessionName) {
+        params.set('name', sessionName)
+      }
+      
+      // Redirigir a la página de cierre
+      router.push(`/s/${sessionCode}/closed?${params.toString()}`)
     } catch (error) {
       console.error('Error al finalizar:', error)
       toast.error(error instanceof Error ? error.message : 'Error al finalizar la cuenta')

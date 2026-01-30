@@ -114,10 +114,31 @@ export function useRealtime(sessionId: string | null) {
           
           // Si la sesión fue eliminada, redirigir a página de cierre
           if (payload.eventType === 'DELETE') {
-            const deletedSession = payload.old as Session
-            toast.info('La cuenta ha sido finalizada')
+            // payload.old solo tiene el ID, así que usamos el estado actual antes de resetear
+            const currentSession = useSessionStore.getState().session
+            
+            // Si no hay sesión en el store, probablemente ya fue limpiada localmente (por el owner)
+            // o no estamos sincronizados. Evitamos redirecciones erróneas al home.
+            if (!currentSession) return
+
+            const sessionName = currentSession.name || 'la cuenta'
+            const shortCode = currentSession.short_code
+
+            toast.info(`La cuenta "${sessionName}" ha sido finalizada`)
+            
             useSessionStore.getState().reset()
-            router.push(`/s/${deletedSession.short_code}/closed`)
+            
+            const params = new URLSearchParams()
+            if (currentSession.name) {
+              params.set('name', currentSession.name)
+            }
+            
+            if (shortCode) {
+              router.push(`/s/${shortCode}/closed?${params.toString()}`)
+            } else {
+              // Si de alguna forma tenemos sesión pero no shortCode, vamos al inicio
+              router.push('/')
+            }
           }
         }
       )

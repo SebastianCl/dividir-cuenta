@@ -101,7 +101,44 @@ export function useRealtime(sessionId: string | null) {
         },
         (payload) => {
           if (payload.eventType === 'UPDATE') {
-            setSession(payload.new as Session)
+            const updatedSession = payload.new as Session
+            setSession(updatedSession)
+            
+            // Si la sesión fue cerrada, notificar y redirigir
+            if (updatedSession.status === 'closed') {
+              toast.info('La cuenta ha sido finalizada por el creador')
+              useSessionStore.getState().reset()
+              router.push(`/s/${updatedSession.short_code}/closed`)
+            }
+          }
+          
+          // Si la sesión fue eliminada, redirigir a página de cierre
+          if (payload.eventType === 'DELETE') {
+            // payload.old solo tiene el ID, así que usamos el estado actual antes de resetear
+            const currentSession = useSessionStore.getState().session
+            
+            // Si no hay sesión en el store, probablemente ya fue limpiada localmente (por el owner)
+            // o no estamos sincronizados. Evitamos redirecciones erróneas al home.
+            if (!currentSession) return
+
+            const sessionName = currentSession.name || 'la cuenta'
+            const shortCode = currentSession.short_code
+
+            toast.info(`La cuenta "${sessionName}" ha sido finalizada`)
+            
+            useSessionStore.getState().reset()
+            
+            const params = new URLSearchParams()
+            if (currentSession.name) {
+              params.set('name', currentSession.name)
+            }
+            
+            if (shortCode) {
+              router.push(`/s/${shortCode}/closed?${params.toString()}`)
+            } else {
+              // Si de alguna forma tenemos sesión pero no shortCode, vamos al inicio
+              router.push('/')
+            }
           }
         }
       )
@@ -126,7 +163,7 @@ export function useRealtime(sessionId: string | null) {
               // Verificar si el usuario eliminado es el actual
               const currentParticipant = useSessionStore.getState().currentParticipant
               if (currentParticipant?.id === deletedId) {
-                toast.error('Has sido eliminado de la cena')
+                toast.error('Has sido eliminado de la cuenta')
                 useSessionStore.getState().reset()
                 router.push('/')
               }

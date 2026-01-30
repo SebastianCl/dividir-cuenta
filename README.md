@@ -1,6 +1,6 @@
 # DIVIDIR CUENTA
 
-Dividir cuenta es una aplicación web para dividir el costo de una cena entre varios participantes, permitiendo agregar ítems, capturar recibos y calcular totales de forma colaborativa y sencilla.
+Dividir cuenta es una aplicación web para dividir el costo de una cuenta entre varios participantes, permitiendo agregar ítems, capturar recibos y calcular totales de forma colaborativa y sencilla.
 
 ## Características principales
 - Agrega participantes y sus avatares personalizados
@@ -42,7 +42,7 @@ Dividir cuenta es una aplicación web para dividir el costo de una cena entre va
 
 ## Uso
 1. Accede a la app en `http://localhost:3000`
-2. Crea o únete a una cena usando un código único
+2. Crea o únete a una cuenta usando un código único
 3. Agrega ítems y participantes
 4. Captura el recibo y revisa el resumen de totales por persona
 

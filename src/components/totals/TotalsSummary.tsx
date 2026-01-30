@@ -88,7 +88,7 @@ export function TotalsSummary() {
   }
 
   const generateSummary = () => {
-    const sessionName = session?.name && session.name !== 'Mi cuenta' && session.name !== 'Mi Cena' ? ` ${session.name}` : ''
+    const sessionName = session?.name && session.name !== 'Mi cuenta' && session.name !== 'Mi cuenta' ? ` ${session.name}` : ''
     let summary = `🍽️ *Resumen${sessionName}*\n`
     summary += `━━━━━━━━━━━━━━━━━━\n\n`
 

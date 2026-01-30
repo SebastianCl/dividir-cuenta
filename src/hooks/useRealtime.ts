@@ -101,7 +101,23 @@ export function useRealtime(sessionId: string | null) {
         },
         (payload) => {
           if (payload.eventType === 'UPDATE') {
-            setSession(payload.new as Session)
+            const updatedSession = payload.new as Session
+            setSession(updatedSession)
+            
+            // Si la sesión fue cerrada, notificar y redirigir
+            if (updatedSession.status === 'closed') {
+              toast.info('La cuenta ha sido finalizada por el creador')
+              useSessionStore.getState().reset()
+              router.push(`/s/${updatedSession.short_code}/closed`)
+            }
+          }
+          
+          // Si la sesión fue eliminada, redirigir a página de cierre
+          if (payload.eventType === 'DELETE') {
+            const deletedSession = payload.old as Session
+            toast.info('La cuenta ha sido finalizada')
+            useSessionStore.getState().reset()
+            router.push(`/s/${deletedSession.short_code}/closed`)
           }
         }
       )

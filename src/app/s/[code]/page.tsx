@@ -20,12 +20,12 @@ import {
   Camera, 
   ShoppingCart, 
   Receipt,
-  Copy,
   Check
 } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 import type { Session } from '@/types/database'
+import { FinalizeSessionDialog } from '@/components/session/FinalizeSessionDialog'
 
 type TabType = 'capture' | 'items' | 'summary'
 
@@ -42,7 +42,7 @@ export default function SessionPage() {
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   
-  const { session, setCurrentParticipant } = useSessionStore()
+  const { session, currentParticipant, setCurrentParticipant } = useSessionStore()
   const supabase = createClient()
   
   // Activar realtime
@@ -229,16 +229,26 @@ export default function SessionPage() {
               </p>
             </div>
           </div>
-          <Button variant="outline" size="sm" onClick={handleShare}>
-            {copied ? (
-              <Check className="h-4 w-4" />
-            ) : (
-              <>
-                <Share2 className="h-4 w-4 mr-2" />
-                Compartir
-              </>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleShare}>
+              {copied ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">Compartir</span>
+                </>
+              )}
+            </Button>
+            {isOwner && sessionId && currentParticipant && (
+              <FinalizeSessionDialog
+                sessionId={sessionId}
+                sessionCode={code}
+                sessionName={session?.name || 'Mi Cena'}
+                participantId={currentParticipant.id}
+              />
             )}
-          </Button>
+          </div>
         </div>
       </header>
 

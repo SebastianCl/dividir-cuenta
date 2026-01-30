@@ -123,8 +123,9 @@ export default function HomePage() {
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <Receipt className="h-8 w-8 text-primary" />
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary/10 mb-4">
+            {/* Logo de la aplicación */}
+            <img src="/logo.webp" alt="Logo" className="h-20 w-20 object-contain" />
           </div>
           <h1 className="text-3xl font-bold">DIVIDIR CUENTA</h1>
           <p className="text-muted-foreground">

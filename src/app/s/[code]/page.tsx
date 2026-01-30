@@ -42,7 +42,7 @@ export default function SessionPage() {
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   
-  const { session, setCurrentParticipant, addItem } = useSessionStore()
+  const { session, setCurrentParticipant } = useSessionStore()
   const supabase = createClient()
   
   // Activar realtime
@@ -186,22 +186,8 @@ export default function SessionPage() {
 
       const { items } = await response.json()
 
-      // Los items se agregan via realtime, pero también actualizamos localmente
-      items.forEach((item: { name: string; quantity: number; unit_price: number; confidence: number }) => {
-        addItem({
-          id: crypto.randomUUID(),
-          session_id: sessionId,
-          name: item.name,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          total_price: item.quantity * item.unit_price,
-          order_index: 0,
-          is_shared: false,
-          ocr_confidence: item.confidence,
-          manually_added: false,
-          created_at: new Date().toISOString(),
-        })
-      })
+      // Los items se agregan automáticamente via realtime cuando se insertan en la BD
+      // No es necesario agregarlos manualmente aquí, ya que causaría duplicación
 
       toast.success(`${items.length} productos detectados`)
       setActiveTab('items')

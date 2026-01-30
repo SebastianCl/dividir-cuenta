@@ -121,7 +121,7 @@ export function FinalizeSessionDialog({
                     Los demás participantes serán notificados del cierre.
                 </p>
 
-                <DialogFooter className="gap-2 sm:gap-0">
+                <DialogFooter className="gap-2 sm:gap-2">
                     <Button variant="outline" onClick={handleClose} disabled={isLoading}>
                         Cancelar
                     </Button>

@@ -11,7 +11,7 @@ interface SessionState {
   items: Item[]
   assignments: Assignment[]
   
-  // Participante actual (almacenado localmente)
+  // Participante actual (almaCuentado localmente)
   currentParticipant: Participant | null
   
   // Acciones
@@ -138,7 +138,7 @@ export const useSessionStore = create<SessionState>()(
       reset: () => set(initialState),
     }),
     {
-      name: 'dividir-cena-storage',
+      name: 'dividir-cuenta-storage',
       partialize: (state) => ({ 
         currentParticipant: state.currentParticipant 
       }),

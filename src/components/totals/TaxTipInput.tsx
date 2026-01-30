@@ -28,7 +28,6 @@ export function TaxTipInput({
   disabled = false,
 }: TaxTipInputProps) {
   const maxValue = type === 'percentage' ? 100 : max
-  const placeholder = type === 'percentage' ? 'Ej: 15' : 'Ej: 5000'
   const suffix = type === 'percentage' ? '%' : '$'
 
   const handleTypeToggle = () => {
@@ -59,7 +58,6 @@ export function TaxTipInput({
             onChange={handleValueChange}
             min={min}
             max={maxValue}
-            placeholder={placeholder}
             className="h-9"
             disabled={disabled}
           />

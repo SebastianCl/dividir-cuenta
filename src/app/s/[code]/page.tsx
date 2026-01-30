@@ -58,13 +58,13 @@ export default function SessionPage() {
         .single<{ id: string; status: string; receipt_image_url?: string; name?: string }>()
 
       if (error || !sessionData) {
-        toast.error('No se encontró la cena')
+        toast.error('No se encontró la cuenta')
         router.push('/')
         return
       }
 
       if (sessionData.status !== 'active') {
-        toast.error('Esta cena ya no está activa')
+        toast.error('Esta cuenta ya no está activa')
         router.push('/')
         return
       }
@@ -102,7 +102,7 @@ export default function SessionPage() {
       setIsLoading(false)
     } catch (error) {
       console.error('Error initializing session:', error)
-      toast.error('Error al cargar la cena')
+      toast.error('Error al cargar la cuenta')
       router.push('/')
     }
   }, [code, router, supabase, setCurrentParticipant])
@@ -117,7 +117,7 @@ export default function SessionPage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Únete a ${session?.name || 'la cena'}`,
+          title: `Únete a ${session?.name || 'la cuenta'}`,
           text: `¡Únete para dividir la cuenta! Código: ${code}`,
           url,
         })
@@ -205,7 +205,7 @@ export default function SessionPage() {
       <main className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Cargando cena...</p>
+          <p className="text-sm text-muted-foreground">Cargando cuenta...</p>
         </div>
       </main>
     )

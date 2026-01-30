@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator'
 import { createClient } from '@/lib/supabase/client'
 import { generateSessionCode, isValidSessionCode } from '@/lib/generate-code'
 import { getRandomColor } from '@/lib/colors'
-import { Utensils, Plus, Users, Loader2 } from 'lucide-react'
+import { Receipt, Plus, Users, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function HomePage() {
@@ -20,7 +20,7 @@ export default function HomePage() {
   const [joinCode, setJoinCode] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [isJoining, setIsJoining] = useState(false)
-  
+
   const supabase = createClient()
 
   const handleCreateSession = async (e: React.FormEvent) => {
@@ -33,13 +33,13 @@ export default function HomePage() {
     setIsCreating(true)
     try {
       const code = generateSessionCode()
-      
+
       // Crear sesión
       const { data: session, error: sessionError } = await supabase
         .from('sessions')
         .insert({
           short_code: code,
-          name: sessionName.trim() || 'Mi Cena',
+          name: sessionName.trim() || 'Mi cuenta',
         } as any)
         .select()
         .single()
@@ -63,11 +63,11 @@ export default function HomePage() {
       // Guardar ID del participante en localStorage
       localStorage.setItem(`participant_${code}`, (participant as any).id)
 
-      toast.success('¡Cena creada!')
+      toast.success('¡Cuenta creada!')
       router.push(`/s/${code}`)
     } catch (error) {
       console.error('Error creating session:', error)
-      toast.error('Error al crear la cena. Intenta de nuevo.')
+      toast.error('Error al crear la cuenta. Intenta de nuevo.')
     } finally {
       setIsCreating(false)
     }
@@ -76,7 +76,7 @@ export default function HomePage() {
   const handleJoinSession = async (e: React.FormEvent) => {
     e.preventDefault()
     const code = joinCode.trim().toUpperCase()
-    
+
     if (!isValidSessionCode(code)) {
       toast.error('Código inválido. Debe tener 6 caracteres.')
       return
@@ -92,12 +92,12 @@ export default function HomePage() {
         .single()
 
       if (error || !session) {
-        toast.error('No se encontró la cena. Verifica el código.')
+        toast.error('No se encontró la cuenta. Verifica el código.')
         return
       }
 
       if ((session as any).status !== 'active') {
-        toast.error('Esta cena ya no está activa.')
+        toast.error('Esta cuenta ya no está activa.')
         return
       }
 
@@ -112,7 +112,7 @@ export default function HomePage() {
       router.push(`/s/${code}/join`)
     } catch (error) {
       console.error('Error joining session:', error)
-      toast.error('Error al buscar la cena. Intenta de nuevo.')
+      toast.error('Error al buscar la cuenta. Intenta de nuevo.')
     } finally {
       setIsJoining(false)
     }
@@ -123,21 +123,22 @@ export default function HomePage() {
       <div className="w-full max-w-md space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <Utensils className="h-8 w-8 text-primary" />
+          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-primary/10 mb-4">
+            {/* Logo de la aplicación */}
+            <img src="/logo.webp" alt="Logo" className="h-20 w-20 object-contain" />
           </div>
-          <h1 className="text-3xl font-bold">Dividir Cena</h1>
+          <h1 className="text-3xl font-bold">DIVIDIR CUENTA</h1>
           <p className="text-muted-foreground">
-            Divide la cuenta del restaurante de forma fácil y justa
+            Divide la cuenta de forma fácil y justa
           </p>
         </div>
 
-        {/* Crear nueva cena */}
+        {/* Crear nueva cuenta */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
-              Crear nueva cena
+              Crear nueva cuenta
             </CardTitle>
             <CardDescription>
               Inicia una sesión y comparte el enlace con tus amigos
@@ -149,17 +150,15 @@ export default function HomePage() {
                 <Label htmlFor="creatorName">Tu nombre</Label>
                 <Input
                   id="creatorName"
-                  placeholder="Ej: Juan"
                   value={creatorName}
                   onChange={(e) => setCreatorName(e.target.value)}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="sessionName">Nombre de la cena (opcional)</Label>
+                <Label htmlFor="sessionName">Nombre de la cuenta (opcional)</Label>
                 <Input
                   id="sessionName"
-                  placeholder="Ej: Cumpleaños de María"
                   value={sessionName}
                   onChange={(e) => setSessionName(e.target.value)}
                 />
@@ -173,7 +172,7 @@ export default function HomePage() {
                 ) : (
                   <>
                     <Plus className="h-4 w-4 mr-2" />
-                    Crear cena
+                    Crear cuenta
                   </>
                 )}
               </Button>
@@ -192,12 +191,12 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Unirse a cena existente */}
+        {/* Unirse a cuenta existente */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Unirse a una cena
+              Unirse a una cuenta
             </CardTitle>
             <CardDescription>
               Ingresa el código que te compartieron
@@ -206,10 +205,9 @@ export default function HomePage() {
           <CardContent>
             <form onSubmit={handleJoinSession} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="joinCode">Código de la cena</Label>
+                <Label htmlFor="joinCode">Código de la cuenta</Label>
                 <Input
                   id="joinCode"
-                  placeholder="Ej: ABC123"
                   value={joinCode}
                   onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                   maxLength={6}

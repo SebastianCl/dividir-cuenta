@@ -41,7 +41,7 @@ export default function JoinSessionPage() {
         .single<{ name: string; status: string }>()
 
       if (error || !session || session.status !== 'active') {
-        toast.error('No se encontró la cena o ya no está activa')
+        toast.error('No se encontró la cuenta o ya no está activa')
         router.push('/')
         return
       }
@@ -121,7 +121,7 @@ export default function JoinSessionPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              Unirse a la cena
+              Unirse a la cuenta
             </CardTitle>
             <CardDescription>
               Te estás uniendo a: <strong>{sessionName}</strong>
@@ -133,7 +133,6 @@ export default function JoinSessionPage() {
                 <Label htmlFor="name">Tu nombre</Label>
                 <Input
                   id="name"
-                  placeholder="Ej: María"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   autoFocus
@@ -162,7 +161,7 @@ export default function JoinSessionPage() {
 
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
-            Código de la cena: <code className="font-mono bg-muted px-2 py-1 rounded">{code}</code>
+            Código de la cuenta: <code className="font-mono bg-muted px-2 py-1 rounded">{code}</code>
           </p>
         </div>
       </div>

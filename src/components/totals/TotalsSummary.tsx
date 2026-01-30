@@ -35,11 +35,11 @@ export function TotalsSummary() {
   const getParticipantFinalTotal = (participantId: string) => {
     const participantSubtotal = getParticipantTotal(participantId)
     if (subtotal === 0) return 0
-    
+
     const proportion = participantSubtotal / subtotal
     const participantTip = tip * proportion
     const participantTax = tax * proportion
-    
+
     return participantSubtotal + participantTip + participantTax
   }
 
@@ -88,14 +88,15 @@ export function TotalsSummary() {
   }
 
   const generateSummary = () => {
-    let summary = `🍽️ *Resumen de la Cena*\n`
+    const sessionName = session?.name && session.name !== 'Mi cuenta' && session.name !== 'Mi Cena' ? ` ${session.name}` : ''
+    let summary = `🍽️ *Resumen${sessionName}*\n`
     summary += `━━━━━━━━━━━━━━━━━━\n\n`
-    
+
     participants.forEach((p) => {
       const total = getParticipantFinalTotal(p.id)
       summary += `👤 ${p.name}: ${formatCOP(total)}\n`
     })
-    
+
     summary += `\n━━━━━━━━━━━━━━━━━━\n`
     summary += `📊 Subtotal: ${formatCOP(subtotal)}\n`
     if (tipValue > 0) {
@@ -107,7 +108,7 @@ export function TotalsSummary() {
       summary += `🧾 Impuestos${taxLabel ? ` (${taxLabel})` : ''}: ${formatCOP(tax)}\n`
     }
     summary += `💵 *Total: ${formatCOP(total)}*`
-    
+
     return summary
   }
 
